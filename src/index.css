@@ -9,13 +9,23 @@
   /* display: block; */
   font-size: 2em;
   max-width: 70vw;
-  margin-top: 40vh;
+  margin-top: 35vh;
+}
+
+.clock {
+  font-size: 1.75em;
 }
 
 .set {
   float: right;
+  width: 16vw;
 }
 
 .snooze {
   float: left;
+  width: 24vw;
+}
+
+.button-container {
+  margin-right: 6vw;
 }
