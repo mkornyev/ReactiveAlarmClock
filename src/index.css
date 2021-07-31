@@ -9,7 +9,24 @@
   /* display: block; */
   font-size: 2em;
   max-width: 70vw;
-  margin-top: 35vh;
+  margin-top: 10vh;
+}
+
+.alarm {
+  background-color: white;
+  border-radius: 50%;
+  height: 25vh;
+  width: 25vh;
+}
+
+@keyframes strobe {
+  50% { background: #d9534f; }
+}
+
+.alarm-on {
+  cursor: pointer;
+  animation-duration: 400ms;
+  animation: strobe 700ms ease infinite;
 }
 
 .clock {

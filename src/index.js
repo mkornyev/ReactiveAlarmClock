@@ -24,6 +24,12 @@ function SnoozeButton(props) {
   )
 }
 
+function Alarm(props) {
+  return (
+    <div className={'alarm' + (props.alarmIsOn ? ' alarm-on':'')} onClick={() => props.stopAlarm()}></div>
+  )
+}
+
 
 // ===================== Clock =====================
 
@@ -57,15 +63,21 @@ class Clock extends React.Component {
     return (
       <div className="row justify-content-md-center">
         <div className="col-md-auto clock">
-          {this.state.time.toLocaleTimeString()}
-            <div className="row button-container">
-              <SetButton setAlarm={() => this.props.set()}
-                         stopAlarm={() => this.props.stopAlarm()} 
-                         alarmIsOn={this.props.alarmIsOn} />
-              <SnoozeButton onClick={() => this.props.snooze()}
-                            alarmIsOn={this.props.alarmIsOn} />
-            </div>
-          {this.state.time.toLocaleDateString()}
+
+          <Alarm alarmIsOn={this.props.alarmIsOn} 
+                 stopAlarm={() => this.props.stopAlarm()}/>
+
+          {this.state.time.toLocaleTimeString()} {/* Time */}
+
+          <div className="row button-container">
+            <SetButton setAlarm={() => this.props.set()}
+                       stopAlarm={() => this.props.stopAlarm()} 
+                       alarmIsOn={this.props.alarmIsOn} />
+            <SnoozeButton onClick={() => this.props.snooze()}
+                          alarmIsOn={this.props.alarmIsOn} />
+          </div>
+
+          {this.state.time.toLocaleDateString()} {/* Date */}
         </div>
       </div>
     )
@@ -78,45 +90,57 @@ class Clock extends React.Component {
 class AlarmClock extends React.Component {
   constructor(props) {
     super(props)
+    this.ALARM_AUDIO_URL = process.env.PUBLIC_URL + '/alarmTone.mp3'
+    this.LOCALSTORGE_ALARM_KEY = 'REACTIVE_ALARM_TIME'
     this.state = {
       userAlarm: null,
+      alarmAudio: null,
       isOn: false,
     }
+    this.handleInitialPageClick = this.handleInitialPageClick.bind(this);
   }
 
   // Load alarm in local storage on first load
   componentDidMount(){
-    let preset = localStorage.getItem("REACTIVE_ALARM_TIME")
+    let preset = localStorage.getItem(this.LOCALSTORGE_ALARM_KEY)
     let setAlarm = new Date(preset)
 
     if(!preset || !setAlarm) return
 
     this.setState({ userAlarm: setAlarm })
+    document.addEventListener('mousedown', this.handleInitialPageClick);
   }
 
-  // Set an alarm 
+  // Listener to handle "ON" alarm state on page load 
+  // EXPLANATION: chrome will not allow a page to play a sound until the user interacts with the page
+  // This contradicts the intended behavior of the alarm
+  handleInitialPageClick(){ 
+    if(this.state.isOn) { this.state.alarmAudio.play() }
+    document.removeEventListener('mousedown', this.handleInitialPageClick);
+  }
+
   setAlarm() {
     let currDate = new Date()
     currDate.setSeconds((currDate.getSeconds() + 5) % 60)
     let setDate = `${currDate.toLocaleDateString()}, ${currDate.toLocaleTimeString()}`
 
-    localStorage.setItem("REACTIVE_ALARM_TIME", setDate)
+    localStorage.setItem(this.LOCALSTORGE_ALARM_KEY, setDate)
     this.setState({
       userAlarm: currDate,
     })
     console.log(`Alarm set for: ${setDate}`)
   }
 
-  // @param duration = time in minutes
   snoozeAlarm(duration=5) {
     if(!this.state.userAlarm || !this.state.isOn) return
+    this.stopAlarm()
 
     let currDate = new Date()
     currDate.setSeconds(currDate.getSeconds() + 5)
     // currDate.setMinutes(currDate.getMinutes() + duration) // OVERFLOW DELEGATED TO DATE CLASS
     let snoozeDate = `${currDate.toLocaleDateString()}, ${currDate.toLocaleTimeString()}`
 
-    localStorage.setItem("REACTIVE_ALARM_TIME", snoozeDate)
+    localStorage.setItem(this.LOCALSTORGE_ALARM_KEY, snoozeDate)
     this.setState({
       userAlarm: currDate,
       isOn: false,
@@ -124,19 +148,29 @@ class AlarmClock extends React.Component {
     console.log(`Alarm snoozed until: ${snoozeDate}`)
   }
 
-  // @staticmethod
   startAlarm() {
     console.log('PLAYING ALARM!')
 
-    this.setState({
-      isOn: true,
-    })
+    if(!this.state.alarmAudio) {
+      const audio = new Audio(this.ALARM_AUDIO_URL)
+      audio.loop = true
+      audio.play()
+      
+      this.setState({ alarmAudio: audio })
+    } else {
+      this.state.alarmAudio.play()
+    }
+
+    this.setState({ isOn: true })
   }
 
   stopAlarm() {
+    if(!this.state.isOn) return
     console.log('Stopping ALARM!')
 
-    localStorage.removeItem("REACTIVE_ALARM_TIME")
+    if(this.state.alarmAudio) this.state.alarmAudio.pause()
+
+    localStorage.removeItem(this.LOCALSTORGE_ALARM_KEY)
     this.setState({
       userAlarm: null,
       isOn: false,
