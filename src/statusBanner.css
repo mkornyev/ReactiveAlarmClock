@@ -1,0 +1,10 @@
+
+.message-banner {
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+
+  font-size: .9em;
+  text-align: center;
+  /* animation: slide-in 600ms ease; */
+}

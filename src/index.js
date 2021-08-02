@@ -1,155 +1,17 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import './mobile-styles.css';
+
+// =================== IMPORTS ===================
+
+import React from 'react'
+import ReactDOM from 'react-dom'
+
+import './index.css'
+
+import Clock from './clock.js'
+import AlarmForm from './alarmForm.js'
+import StatusBanner from './statusBanner'
 
 
-// ===================== Control Buttons =====================
-
-function SetButton(props) { 
-  let buttonColorClass = props.alarmIsOn ? 'btn-danger' : 'btn-dark'
-  let buttonContent = props.alarmIsOn ? 'Stop' : 'Set'
-  var onClickAction = props.alarmIsOn ? props.stopAlarm : props.setAlarm
-
-  return (
-    <div className="col-sm-5">
-      <button className={"set btn btn-lg " + buttonColorClass} onClick={() => onClickAction()}>{buttonContent}</button>
-    </div>
-  )
-}
-
-function SnoozeButton(props) {
-  return (
-    <div className="col-sm-5">
-      <button className="btn btn-lg btn-dark snooze" onClick={() => props.onClick()} disabled={!props.alarmIsOn}>Snooze for 5 minutes</button>
-    </div>
-  )
-}
-
-// ===================== Alarm Element =====================
-
-function Alarm(props) {
-  return (
-    <div className={'alarm' + (props.alarmIsOn ? ' alarm-on':'')} onClick={() => props.stopAlarm()}></div>
-  )
-}
-
-
-// ===================== Clock =====================
-
-class Clock extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      time: new Date(), // Browser Time
-    }
-  }
-
-  componentDidMount(){
-    this.timer = setInterval(() => this.updateClock(), 1000)
-  }
-
-  // Update Display & Start the alarm if needed 
-  updateClock(){
-    this.setState({ time: new Date() })
-
-    if(!this.props.alarmIsOn && this.props.userAlarm && this.props.userAlarm <= this.state.time) {
-      this.props.startAlarm()
-    }
-  }
-
-  componentWillUnmount(){
-    clearInterval(this.timer)
-    if(this.props.alarmIsOn) this.props.stopAlarm()
-  }
-
-  render() {
-    return (
-      <div className="row justify-content-md-center">
-        <div className="col-md-auto clock">
-
-          <Alarm alarmIsOn={this.props.alarmIsOn} 
-                 stopAlarm={() => this.props.stopAlarm()}/>
-
-          {this.state.time.toLocaleTimeString()} {/* Time */}
-
-          <div className="row button-container">
-            <SetButton setAlarm={() => this.props.set()}
-                       stopAlarm={() => this.props.stopAlarm()} 
-                       alarmIsOn={this.props.alarmIsOn} />
-
-            <SnoozeButton onClick={() => this.props.snooze()}
-                          alarmIsOn={this.props.alarmIsOn} />
-          </div>
-
-          {this.state.time.toLocaleDateString()} {/* Date */}
-        </div>
-      </div>
-    )
-  }
-}
-
-
-// ===================== Alarm Form =====================
-
-class AlarmForm extends React.Component{
-  constructor(props) {
-    super(props)
-    this.input = React.createRef();
-  }
-
-  render() {
-    let d = new Date()
-    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-    this.timestamp = d.toISOString().slice(0,16);
-
-    return (
-      <div className={"splash-page" + ( this.props.isBeingSet ? ' splash-expanded':'')}>
-        <div className='row'>
-          <div className='col'>
-            
-            <label htmlFor="alarm-datetime-input" className="form-label">Set an Alarm:</label>
-            <input id="alarm-datetime-input" 
-                    ref={this.input}
-                    type="datetime-local" 
-                    className="form-control" 
-                    defaultValue={this.timestamp}
-                    min={this.timestamp}
-                  />
-            <button className="btn btn-lg btn-light"
-                    onClick={() => this.props.saveSetting()}>Set Alarm</button>
-            <button className="btn btn-lg btn-light" 
-                    onClick={() => this.props.stopSetting()}>Cancel</button>
-            <button className="btn btn-lg btn-danger clear-button"
-                    onClick={() => this.props.clearSetting()}>Clear Alarm</button>
-          </div>
-        </div>
-      </div>
-    )
-  }
-}
-
-
-// ===================== Message Banner =====================
-function StatusBanner(props) {
-  if(props.userAlarm){
-    let currDate = new Date()
-    let onString = props.userAlarm.getDay() !== currDate.getDay() ? `on ${props.userAlarm.toLocaleDateString()}`:''
-    let status = props.userAlarm ? `You've set an alarm for ${props.userAlarm.toLocaleTimeString()} ${onString}`:'Set an alarm below...'
-
-    return (
-      <div className='row justify-content-md-center'>
-        <div className='col message-banner'>
-          {!props.hide ? status:''}
-        </div>
-      </div>
-    )
-  }
-  return (<div></div>)
-}
-
-
-// ===================== AlarmClock =====================
+// =================== COMPONENT ===================
 
 class AlarmClock extends React.Component {
   constructor(props) {

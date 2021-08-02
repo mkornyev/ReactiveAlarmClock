@@ -1,0 +1,49 @@
+
+.clock {
+  font-size: 1.75em;
+}
+
+.set {
+  float: right;
+  width: 16vw;
+}
+
+.snooze {
+  float: left;
+  width: 24vw;
+}
+
+.alarm {
+  background-color: white;
+  border-radius: 50%;
+  height: 25vh;
+  width: 25vh;
+}
+
+.alarm-on {
+  cursor: pointer;
+  animation-duration: 400ms;
+  animation: strobe 700ms ease infinite;
+}
+
+@keyframes strobe {
+  50% { background: #d9534f; }
+}
+
+
+/* =================== MEDIA QUERIES =================== */
+
+@media only screen and (max-width: 768px) {
+  
+  .set {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  .snooze {
+    width: 100%;
+  }
+  .alarm {
+    margin: auto;
+  }
+
+}
