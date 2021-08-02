@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
+
 // ===================== Control Buttons =====================
 
 function SetButton(props) { 
@@ -19,10 +20,12 @@ function SetButton(props) {
 function SnoozeButton(props) {
   return (
     <div className="col">
-      <button className="btn btn-lg btn-dark snooze" onClick={() => props.onClick()} disabled={!props.alarmIsOn}>Snooze</button>
+      <button className="btn btn-lg btn-dark snooze" onClick={() => props.onClick()} disabled={!props.alarmIsOn}>Snooze for 5 minutes</button>
     </div>
   )
 }
+
+// ===================== Alarm Element =====================
 
 function Alarm(props) {
   return (
@@ -45,7 +48,7 @@ class Clock extends React.Component {
     this.timer = setInterval(() => this.updateClock(), 1000)
   }
 
-  // Update Display & Set of the alarm if needed 
+  // Update Display & Start the alarm if needed 
   updateClock(){
     this.setState({ time: new Date() })
 
@@ -73,6 +76,7 @@ class Clock extends React.Component {
             <SetButton setAlarm={() => this.props.set()}
                        stopAlarm={() => this.props.stopAlarm()} 
                        alarmIsOn={this.props.alarmIsOn} />
+
             <SnoozeButton onClick={() => this.props.snooze()}
                           alarmIsOn={this.props.alarmIsOn} />
           </div>
@@ -85,17 +89,57 @@ class Clock extends React.Component {
 }
 
 
+// ===================== Alarm Form =====================
+
+class AlarmForm extends React.Component{
+  constructor(props) {
+    super(props)
+    this.input = React.createRef();
+  }
+
+  render() {
+    let d = new Date()
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    this.timestamp = d.toISOString().slice(0,16);
+
+    return (
+      <div className={"splash-page" + ( this.props.isBeingSet ? ' splash-expanded':'')}>
+        <div className='row'>
+          <div className='col'>
+            
+            <label htmlFor="alarm-datetime-input" className="form-label">Set an Alarm:</label>
+            <input id="alarm-datetime-input" 
+                    ref={this.input}
+                    type="datetime-local" 
+                    className="form-control" 
+                    defaultValue={this.timestamp}
+                    min={this.timestamp}
+                  />
+            <button className="btn btn-lg btn-light"
+                    onClick={() => this.props.saveSetting()}>Set Alarm</button>
+            <button className="btn btn-lg btn-light" 
+                    onClick={() => this.props.stopSetting()}>Cancel</button>
+
+          </div>
+        </div>
+      </div>
+    )
+  }
+}
+
+
 // ===================== AlarmClock =====================
 
 class AlarmClock extends React.Component {
   constructor(props) {
     super(props)
-    this.ALARM_AUDIO_URL = process.env.PUBLIC_URL + '/alarmTone.mp3'
+    this.ALARM_AUDIO_URL = process.env.PUBLIC_URL + '/ringtones/apple_ding.mp3'
     this.LOCALSTORGE_ALARM_KEY = 'REACTIVE_ALARM_TIME'
     this.state = {
       userAlarm: null,
       alarmAudio: null,
       isOn: false,
+      isBeingSet: false,
     }
     this.handleInitialPageClick = this.handleInitialPageClick.bind(this);
   }
@@ -119,24 +163,12 @@ class AlarmClock extends React.Component {
     document.removeEventListener('mousedown', this.handleInitialPageClick);
   }
 
-  setAlarm() {
-    let currDate = new Date()
-    currDate.setSeconds((currDate.getSeconds() + 5) % 60)
-    let setDate = `${currDate.toLocaleDateString()}, ${currDate.toLocaleTimeString()}`
-
-    localStorage.setItem(this.LOCALSTORGE_ALARM_KEY, setDate)
-    this.setState({
-      userAlarm: currDate,
-    })
-    console.log(`Alarm set for: ${setDate}`)
-  }
-
   snoozeAlarm(duration=5) {
     if(!this.state.userAlarm || !this.state.isOn) return
     this.stopAlarm()
 
     let currDate = new Date()
-    currDate.setSeconds(currDate.getSeconds() + 5)
+    currDate.setMinutes(currDate.getMinutes() + duration)
     // currDate.setMinutes(currDate.getMinutes() + duration) // OVERFLOW DELEGATED TO DATE CLASS
     let snoozeDate = `${currDate.toLocaleDateString()}, ${currDate.toLocaleTimeString()}`
 
@@ -177,12 +209,49 @@ class AlarmClock extends React.Component {
     })
   }
 
+  startSetting() {
+    this.setState({
+      isBeingSet: true,
+    })
+  }
+  
+  stopSetting() {
+    this.setState({
+      isBeingSet: false,
+    })
+  }
+
+  saveSetting() {
+    // if(!this.state.isBeingSet){
+    //   this.setState({ isBeingSet: true })
+    //   return 
+    // }
+    let setDate = document.getElementById('alarm-datetime-input')
+    setDate = new Date(setDate.value)
+    let stringDate = `${setDate.toLocaleDateString()}, ${setDate.toLocaleTimeString()}`
+
+    if(stringDate && setDate) {
+      localStorage.setItem(this.LOCALSTORGE_ALARM_KEY, stringDate)
+      this.setState({
+        userAlarm: setDate,
+        isBeingSet: false,
+      })
+      this.stopSetting()
+      console.log(`Alarm set for: ${stringDate}`)
+    }
+  }
+
   render() {
     return(
       <div className="container-fluid">
+        <AlarmForm 
+               isBeingSet={this.state.isBeingSet}
+               saveSetting={() => this.saveSetting()} 
+               stopSetting={() => this.stopSetting()} />
+
         <Clock userAlarm={this.state.userAlarm} 
                alarmIsOn={this.state.isOn} 
-               set={() => this.setAlarm()}
+               set={() => this.startSetting()}
                snooze={() => this.snoozeAlarm()}
                startAlarm={() => this.startAlarm()} 
                stopAlarm={() => this.stopAlarm()} />
