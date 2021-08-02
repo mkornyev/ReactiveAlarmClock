@@ -119,12 +119,32 @@ class AlarmForm extends React.Component{
                     onClick={() => this.props.saveSetting()}>Set Alarm</button>
             <button className="btn btn-lg btn-light" 
                     onClick={() => this.props.stopSetting()}>Cancel</button>
-
+            <button className="btn btn-lg btn-danger clear-button"
+                    onClick={() => this.props.clearSetting()}>Clear Alarm</button>
           </div>
         </div>
       </div>
     )
   }
+}
+
+
+// ===================== Message Banner =====================
+function StatusBanner(props) {
+  if(props.userAlarm){
+    let currDate = new Date()
+    let onString = props.userAlarm.getDay() !== currDate.getDay() ? `on ${props.userAlarm.toLocaleDateString()}`:''
+    let status = props.userAlarm ? `You've set an alarm for ${props.userAlarm.toLocaleTimeString()} ${onString}`:'Set an alarm below...'
+
+    return (
+      <div className='row justify-content-md-center'>
+        <div className='col message-banner'>
+          {!props.hide ? status:''}
+        </div>
+      </div>
+    )
+  }
+  return (<div></div>)
 }
 
 
@@ -193,7 +213,10 @@ class AlarmClock extends React.Component {
       this.state.alarmAudio.play()
     }
 
-    this.setState({ isOn: true })
+    this.setState({ 
+      isOn: true,
+      isBeingSet: false,
+    })
   }
 
   stopAlarm() {
@@ -241,13 +264,24 @@ class AlarmClock extends React.Component {
     }
   }
 
+  clearSetting() {
+    this.setState({
+      userAlarm: null,
+      isBeingSet: false,
+    })
+  }
+
   render() {
     return(
       <div className="container-fluid">
+        <StatusBanner userAlarm={this.state.userAlarm}
+                      hide={this.state.isOn}/>
+
         <AlarmForm 
                isBeingSet={this.state.isBeingSet}
                saveSetting={() => this.saveSetting()} 
-               stopSetting={() => this.stopSetting()} />
+               stopSetting={() => this.stopSetting()} 
+               clearSetting={() => this.clearSetting()}/>
 
         <Clock userAlarm={this.state.userAlarm} 
                alarmIsOn={this.state.isOn} 

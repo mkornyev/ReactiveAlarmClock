@@ -12,6 +12,16 @@
   margin-top: 10vh;
 }
 
+.message-banner {
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+
+  font-size: .9em;
+  text-align: center;
+  /* animation: slide-in 600ms ease; */
+}
+
 .alarm {
   background-color: white;
   border-radius: 50%;
@@ -45,6 +55,11 @@
 
 .button-container {
   margin-right: 6vw;
+}
+
+.clear-button {
+  float: right;
+  margin-right: 0px !important;
 }
 
 .splash-page {
