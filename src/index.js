@@ -51,8 +51,7 @@ class AlarmClock extends React.Component {
     this.stopAlarm()
 
     let currDate = new Date()
-    currDate.setMinutes(currDate.getMinutes() + duration)
-    // currDate.setMinutes(currDate.getMinutes() + duration) // OVERFLOW DELEGATED TO DATE CLASS
+    currDate.setMinutes(currDate.getMinutes() + duration) // OVERFLOW DELEGATED TO DATE CLASS
     let snoozeDate = `${currDate.toLocaleDateString()}, ${currDate.toLocaleTimeString()}`
 
     localStorage.setItem(this.LOCALSTORGE_ALARM_KEY, snoozeDate)
@@ -60,12 +59,9 @@ class AlarmClock extends React.Component {
       userAlarm: currDate,
       isOn: false,
     })
-    console.log(`Alarm snoozed until: ${snoozeDate}`)
   }
 
   startAlarm() {
-    console.log('PLAYING ALARM!')
-
     if(!this.state.alarmAudio) {
       const audio = new Audio(this.ALARM_AUDIO_URL)
       audio.loop = true
@@ -84,8 +80,6 @@ class AlarmClock extends React.Component {
 
   stopAlarm() {
     if(!this.state.isOn) return
-    console.log('Stopping ALARM!')
-
     if(this.state.alarmAudio) this.state.alarmAudio.pause()
 
     localStorage.removeItem(this.LOCALSTORGE_ALARM_KEY)
@@ -108,10 +102,6 @@ class AlarmClock extends React.Component {
   }
 
   saveSetting() {
-    // if(!this.state.isBeingSet){
-    //   this.setState({ isBeingSet: true })
-    //   return 
-    // }
     let setDate = document.getElementById('alarm-datetime-input')
     setDate = new Date(setDate.value)
     let stringDate = `${setDate.toLocaleDateString()}, ${setDate.toLocaleTimeString()}`
@@ -123,7 +113,6 @@ class AlarmClock extends React.Component {
         isBeingSet: false,
       })
       this.stopSetting()
-      console.log(`Alarm set for: ${stringDate}`)
     }
   }
 
