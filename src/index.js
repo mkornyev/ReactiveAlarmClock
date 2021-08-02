@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+import './mobile-styles.css';
 
 
 // ===================== Control Buttons =====================
@@ -11,7 +12,7 @@ function SetButton(props) {
   var onClickAction = props.alarmIsOn ? props.stopAlarm : props.setAlarm
 
   return (
-    <div className="col">
+    <div className="col-sm-5">
       <button className={"set btn btn-lg " + buttonColorClass} onClick={() => onClickAction()}>{buttonContent}</button>
     </div>
   )
@@ -19,7 +20,7 @@ function SetButton(props) {
 
 function SnoozeButton(props) {
   return (
-    <div className="col">
+    <div className="col-sm-5">
       <button className="btn btn-lg btn-dark snooze" onClick={() => props.onClick()} disabled={!props.alarmIsOn}>Snooze for 5 minutes</button>
     </div>
   )
