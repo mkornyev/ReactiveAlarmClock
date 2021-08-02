@@ -4,7 +4,7 @@ A minimalistic alarm clock running only on React and time stamps that it saves i
 ### Get Started
 
 * Clone locally and run the project with `npm start`
-* OR Check out the beta deployment here: `[NO LINK YET!]`
+* OR Check out the beta deployment here: `[ez-alarm.herokuapp.com](https://ez-alarm.herokuapp.com/)`
 
 ### Project Dependencies
 
