@@ -266,6 +266,7 @@ class AlarmClock extends React.Component {
   }
 
   clearSetting() {
+    localStorage.removeItem(this.LOCALSTORGE_ALARM_KEY)
     this.setState({
       userAlarm: null,
       isBeingSet: false,
