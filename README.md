@@ -9,6 +9,7 @@ A minimalistic alarm clock running only on React and time stamps that it saves i
 ### Project Dependencies
 
 * `React 17.0.2` 
+* `TypeScript 4.3.5`
 * `Node v16.5.0`
 * `Npm 7.20.1`
 

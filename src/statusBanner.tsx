@@ -18,8 +18,10 @@ type StatusBannerProps = {
 function StatusBanner(props: StatusBannerProps) {
   if(props.userAlarm){
     let currDate = new Date()
-    let onString = props.userAlarm.getDay() !== currDate.getDay() ? `on ${props.userAlarm.toLocaleDateString()}`:''
-    let status = props.userAlarm ? `You've set an alarm for ${props.userAlarm.toLocaleTimeString()} ${onString}`:'Set an alarm below...'
+    let dateString = props.userAlarm.getDay() !== currDate.getDay() ? `on ${props.userAlarm.toLocaleDateString()}`:''
+    let alarmDecomp = props.userAlarm.toLocaleTimeString().split(':')
+    let alarmRemainder = alarmDecomp.pop()
+    let status = props.userAlarm ? `You've set an alarm for ${alarmDecomp.join(':') + ' ' + alarmRemainder.split(' ')[1]} ${dateString}`:'Set an alarm below...'
 
     return (
       <div className='row justify-content-md-center'>
