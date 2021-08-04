@@ -5,9 +5,17 @@ import React from 'react'
 import './statusBanner.css'
 
 
+// =================== COMPONENT TYPES ===================
+
+type StatusBannerProps = { 
+  userAlarm?: Date,
+  hide: Boolean,
+}
+
+
 // =================== COMPONENT ===================
 
-function StatusBanner(props) {
+function StatusBanner(props: StatusBannerProps) {
   if(props.userAlarm){
     let currDate = new Date()
     let onString = props.userAlarm.getDay() !== currDate.getDay() ? `on ${props.userAlarm.toLocaleDateString()}`:''

@@ -5,9 +5,41 @@ import React from 'react'
 import './clock.css'
 
 
+// =================== COMPONENT TYPES ===================
+
+type AlarmProps = {
+  alarmIsOn: Boolean,
+  stopAlarm: () => void,
+}
+
+type SetButtonProps = {
+  alarmIsOn: Boolean,
+  setAlarm: () => void,
+  stopAlarm: () => void,
+}
+
+type SnoozeButtonProps = {
+  alarmIsOn: Boolean,
+  onClick: () => void,
+}
+
+type ClockProps = {
+  alarmIsOn: Boolean,
+  userAlarm: Date,
+  startAlarm: () => void,
+  stopAlarm: () => void,
+  set: () => void,
+  snooze: () => void,
+}
+
+type ClockState = {
+  time: Date,
+}
+
+
 // =================== ALARM FACE ===================
 
-function Alarm(props) {
+function Alarm(props: AlarmProps) {
   return (
     <div className={'alarm' + (props.alarmIsOn ? ' alarm-on':'')} onClick={() => props.stopAlarm()}></div>
   )
@@ -16,7 +48,7 @@ function Alarm(props) {
 
 // =================== CONTROL BUTTONS ===================
 
-function SetButton(props) { 
+function SetButton(props: SetButtonProps) { 
   let buttonColorClass = props.alarmIsOn ? 'btn-danger' : 'btn-dark'
   let buttonContent = props.alarmIsOn ? 'Stop' : 'Set'
   var onClickAction = props.alarmIsOn ? props.stopAlarm : props.setAlarm
@@ -28,7 +60,7 @@ function SetButton(props) {
   )
 }
 
-function SnoozeButton(props) {
+function SnoozeButton(props: SnoozeButtonProps) {
   return (
     <div className="col-sm-5">
       <button className="snooze btn btn-lg btn-dark" onClick={() => props.onClick()} disabled={!props.alarmIsOn}>Snooze for 5 minutes</button>
@@ -39,8 +71,10 @@ function SnoozeButton(props) {
 
 // =================== COMPONENT ===================
 
-class Clock extends React.Component {
-  constructor(props) {
+class Clock extends React.Component<ClockProps, ClockState> {
+  timer: NodeJS.Timer
+
+  constructor(props: ClockProps) {
     super(props)
     this.state = {
       time: new Date(), // Browser Time

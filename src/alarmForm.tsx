@@ -1,14 +1,27 @@
 
 // =================== IMPORTS ===================
 
-import React from 'react'
+import React, {LegacyRef} from 'react'
 import './alarmForm.css'
+
+
+// =================== COMPONENT TYPES ===================
+
+type AlarmFormProps = { 
+  isBeingSet: Boolean,
+  saveSetting: () => void,
+  stopSetting: () => void,
+  clearSetting: () => void,
+}
 
 
 // =================== COMPONENT ===================
 
-class AlarmForm extends React.Component{
-  constructor(props) {
+class AlarmForm extends React.Component<AlarmFormProps, {}>{
+  input: React.RefObject<unknown>
+  timestamp: string
+
+  constructor(props: AlarmFormProps) {
     super(props)
     this.input = React.createRef();
   }
@@ -25,7 +38,7 @@ class AlarmForm extends React.Component{
             
             <label htmlFor="alarm-datetime-input" className="form-label">Set an Alarm:</label>
             <input id="alarm-datetime-input" 
-                    ref={this.input}
+                    ref={this.input as LegacyRef<HTMLInputElement>}
                     type="datetime-local" 
                     className="form-control" 
                     defaultValue={this.timestamp}

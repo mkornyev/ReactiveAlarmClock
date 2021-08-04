@@ -6,18 +6,29 @@ import ReactDOM from 'react-dom'
 
 import './index.css'
 
-import Clock from './clock.js'
-import AlarmForm from './alarmForm.js'
+import Clock from './clock'
+import AlarmForm from './alarmForm'
 import StatusBanner from './statusBanner'
+
+
+// =================== COMPONENT TYPES ===================
+
+type AlarmClockState = { 
+  userAlarm?: Date,
+  alarmAudio?: HTMLAudioElement, 
+  isOn: Boolean,
+  isBeingSet: Boolean,
+}
 
 
 // =================== COMPONENT ===================
 
-class AlarmClock extends React.Component {
-  constructor(props) {
+class AlarmClock extends React.Component<{}, AlarmClockState> {
+  static ALARM_AUDIO_URL: string = process.env.PUBLIC_URL + '/ringtones/apple_ding.mp3' 
+  static LOCALSTORGE_ALARM_KEY: string = 'REACTIVE_ALARM_TIME'
+  
+  constructor(props: {}) {
     super(props)
-    this.ALARM_AUDIO_URL = process.env.PUBLIC_URL + '/ringtones/apple_ding.mp3'
-    this.LOCALSTORGE_ALARM_KEY = 'REACTIVE_ALARM_TIME'
     this.state = {
       userAlarm: null,
       alarmAudio: null,
@@ -29,8 +40,8 @@ class AlarmClock extends React.Component {
 
   // Load alarm in local storage on first load
   componentDidMount(){
-    let preset = localStorage.getItem(this.LOCALSTORGE_ALARM_KEY)
-    let setAlarm = new Date(preset)
+    let preset = localStorage.getItem(AlarmClock.LOCALSTORGE_ALARM_KEY)
+    let setAlarm = preset ? new Date(preset):null
 
     if(!preset || !setAlarm) return
 
@@ -54,7 +65,7 @@ class AlarmClock extends React.Component {
     currDate.setMinutes(currDate.getMinutes() + duration) // OVERFLOW DELEGATED TO DATE CLASS
     let snoozeDate = `${currDate.toLocaleDateString()}, ${currDate.toLocaleTimeString()}`
 
-    localStorage.setItem(this.LOCALSTORGE_ALARM_KEY, snoozeDate)
+    localStorage.setItem(AlarmClock.LOCALSTORGE_ALARM_KEY, snoozeDate)
     this.setState({
       userAlarm: currDate,
       isOn: false,
@@ -63,7 +74,7 @@ class AlarmClock extends React.Component {
 
   startAlarm() {
     if(!this.state.alarmAudio) {
-      const audio = new Audio(this.ALARM_AUDIO_URL)
+      const audio = new Audio(AlarmClock.ALARM_AUDIO_URL)
       audio.loop = true
       audio.play()
       
@@ -82,7 +93,7 @@ class AlarmClock extends React.Component {
     if(!this.state.isOn) return
     if(this.state.alarmAudio) this.state.alarmAudio.pause()
 
-    localStorage.removeItem(this.LOCALSTORGE_ALARM_KEY)
+    localStorage.removeItem(AlarmClock.LOCALSTORGE_ALARM_KEY)
     this.setState({
       userAlarm: null,
       isOn: false,
@@ -102,12 +113,12 @@ class AlarmClock extends React.Component {
   }
 
   saveSetting() {
-    let setDate = document.getElementById('alarm-datetime-input')
-    setDate = new Date(setDate.value)
+    let dateInput = (document.getElementById('alarm-datetime-input') as HTMLTextAreaElement).value
+    let setDate = new Date(dateInput)
     let stringDate = `${setDate.toLocaleDateString()}, ${setDate.toLocaleTimeString()}`
 
     if(stringDate && setDate) {
-      localStorage.setItem(this.LOCALSTORGE_ALARM_KEY, stringDate)
+      localStorage.setItem(AlarmClock.LOCALSTORGE_ALARM_KEY, stringDate)
       this.setState({
         userAlarm: setDate,
         isBeingSet: false,
@@ -117,7 +128,7 @@ class AlarmClock extends React.Component {
   }
 
   clearSetting() {
-    localStorage.removeItem(this.LOCALSTORGE_ALARM_KEY)
+    localStorage.removeItem(AlarmClock.LOCALSTORGE_ALARM_KEY)
     this.setState({
       userAlarm: null,
       isBeingSet: false,
